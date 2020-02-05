@@ -142,7 +142,8 @@ def lambda_handler(event, context):
                         'RestrictPublicBuckets': True
                     },
                     AccountId = accountid
-                )                
+                )
+                logger.debug("Response on setting new S3 public policy- %s" %blocks3public)           
 
         except ClientError as e:
             logger.error("An error occurred: %s" %e)
