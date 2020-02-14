@@ -1,5 +1,5 @@
 provider "aws" {
-    profile = "master"
+    profile = "svb-master"
     region = "us-east-1" // Replace with global trail region
 }
 
@@ -49,8 +49,22 @@ data "aws_iam_policy_document" "ComplianceRepairLambdaPolicy" {
     statement {
         sid = "ComplianceRepairLambdaS3PublicPolicy"
         actions = [
-            "s3:PutAccountPublicAccessBlock",
-            "s3:GetAccountPublicAccessBlock"
+            "s3:GetBucketPublicAccessBlock",
+            "s3:PutBucketPublicAccessBlock"
+        ]
+        resources = ["*"]
+    }
+    statement {
+        sid = "S3NewBucketMaciePolicy"
+        actions = [
+            "macie:AssociateS3Resources"
+        ]
+        resources = ["*"]
+    }
+    statement {
+        sid = "ConfigRecorderLoggingPolicy"
+        actions = [
+            "config:StartConfigurationRecorder"
         ]
         resources = ["*"]
     }
@@ -129,10 +143,10 @@ resource "aws_cloudwatch_event_rule" "CloudtrailLoggingDisabled" {
     PATTERN
 }
 
-# S3 Account Public Event
-resource "aws_cloudwatch_event_rule" "S3AccountPublicPolicyChange" {
-    name        = "S3AccountPublicPolicyChange"
-    description = "S3 Account Public Policy Change"
+# CloudWatch S3PublicAccessChange Event
+resource "aws_cloudwatch_event_rule" "S3PublicAccessChange" {
+    name        = "S3PublicAccessChange"
+    description = "S3 Public Access Change"
 
     event_pattern = <<PATTERN
     {
@@ -147,10 +161,58 @@ resource "aws_cloudwatch_event_rule" "S3AccountPublicPolicyChange" {
                 "s3.amazonaws.com"
             ],
             "eventName": [
-                "PutAccountPublicAccessBlock",
-                "DeleteAccountPublicAccessBlock",
                 "DeleteBucketPublicAccessBlock",
                 "PutBucketPublicAccessBlock"
+            ]
+        }
+    }
+    PATTERN
+}
+
+# CloudWatch S3NewBucket Event
+resource "aws_cloudwatch_event_rule" "S3NewBucket" {
+    name        = "S3NewBucket"
+    description = "S3 New Bucket"
+
+    event_pattern = <<PATTERN
+    {
+        "source": [
+            "aws.s3"
+        ],
+        "detail-type": [
+            "AWS API Call via CloudTrail"
+        ],
+        "detail": {
+            "eventSource": [
+                "s3.amazonaws.com"
+            ],
+            "eventName": [
+                "CreateBucket"
+            ]
+        }
+    }
+    PATTERN
+}
+
+# CloudWatch ConfigRecorderStopped Event
+resource "aws_cloudwatch_event_rule" "ConfigRecorderStopped" {
+    name        = "ConfigRecorderStopped"
+    description = "Config Recorder Stopped"
+
+    event_pattern = <<PATTERN
+    {
+        "source": [
+            "aws.config"
+        ],
+        "detail-type": [
+            "AWS API Call via CloudTrail"
+        ],
+        "detail": {
+            "eventSource": [
+                "config.amazonaws.com"
+            ],
+            "eventName": [
+                "StopConfigurationRecorder"
             ]
         }
     }
@@ -175,32 +237,64 @@ resource "aws_lambda_permission" "AllowExecutionFromCloudtrailLoggingDisabled" {
     source_arn = aws_cloudwatch_event_rule.CloudtrailLoggingDisabled.arn
 }
 
-# Lambda CloudtrailLoggingDisabled Permission
-resource "aws_lambda_permission" "AllowExecutionFromS3AccountPublicPolicyChange" {
-    statement_id = "AllowExecutionFromS3AccountPublicPolicyChange"
+# Lambda S3PublicAccessChange Permission
+resource "aws_lambda_permission" "AllowExecutionFromS3PublicAccessChange" {
+    statement_id = "AllowExecutionFromS3PublicAccessChange"
     action = "lambda:InvokeFunction"
     function_name = aws_lambda_function.ComplianceRepair.function_name
     principal = "events.amazonaws.com"
-    source_arn = aws_cloudwatch_event_rule.S3AccountPublicPolicyChange.arn
+    source_arn = aws_cloudwatch_event_rule.S3PublicAccessChange.arn
+}
+
+# Lambda S3NewBucket Permission
+resource "aws_lambda_permission" "AllowExecutionFromS3NewBucket" {
+    statement_id = "AllowExecutionFromS3NewBucket"
+    action = "lambda:InvokeFunction"
+    function_name = aws_lambda_function.ComplianceRepair.function_name
+    principal = "events.amazonaws.com"
+    source_arn = aws_cloudwatch_event_rule.S3NewBucket.arn
+}
+
+# Lambda ConfigRecorderStopped Permission
+resource "aws_lambda_permission" "AllowExecutionFromConfigRecorderStopped" {
+    statement_id = "AllowExecutionFromConfigRecorderStopped"
+    action = "lambda:InvokeFunction"
+    function_name = aws_lambda_function.ComplianceRepair.function_name
+    principal = "events.amazonaws.com"
+    source_arn = aws_cloudwatch_event_rule.ConfigRecorderStopped.arn
 }
 
 # CloudWatch PasswordPolicyChange Event Target
 resource "aws_cloudwatch_event_target" "LambdaPasswordPolicy" {
-    rule        = aws_cloudwatch_event_rule.PasswordPolicyChange.name
-    target_id   = "SendToLambda"
-    arn         = aws_lambda_function.ComplianceRepair.arn
+    rule = aws_cloudwatch_event_rule.PasswordPolicyChange.name
+    target_id = "SendToLambda"
+    arn = aws_lambda_function.ComplianceRepair.arn
 }
 
 # CloudWatch CloudtrailLoggingDisabled Event Target
 resource "aws_cloudwatch_event_target" "LambdaCloudtrailLogging" {
-    rule        = aws_cloudwatch_event_rule.CloudtrailLoggingDisabled.name
-    target_id   = "SendToLambda"
-    arn         = aws_lambda_function.ComplianceRepair.arn
+    rule = aws_cloudwatch_event_rule.CloudtrailLoggingDisabled.name
+    target_id = "SendToLambda"
+    arn = aws_lambda_function.ComplianceRepair.arn
 }
 
-# CloudWatch S3AccountPublicPolicyChange Event Target
-resource "aws_cloudwatch_event_target" "LambdaS3AccountPublicPolicyChange" {
-    rule        = aws_cloudwatch_event_rule.S3AccountPublicPolicyChange.name
-    target_id   = "SendToLambda"
-    arn         = aws_lambda_function.ComplianceRepair.arn
+# CloudWatch S3PublicAccessChange Event Target
+resource "aws_cloudwatch_event_target" "LambdaS3PublicAccess" {
+    rule = aws_cloudwatch_event_rule.S3PublicAccessChange.name
+    target_id = "SendToLambda"
+    arn = aws_lambda_function.ComplianceRepair.arn
+}
+
+# CloudWatch S3NewBucket Event Target
+resource "aws_cloudwatch_event_target" "LambdaS3NewBucket" {
+    rule = aws_cloudwatch_event_rule.S3NewBucket.name
+    target_id = "SendToLambda"
+    arn = aws_lambda_function.ComplianceRepair.arn
+}
+
+# CloudWatch ConfigRecorderStopped Event Target
+resource "aws_cloudwatch_event_target" "LambdaConfigRecorderStopped" {
+    rule = aws_cloudwatch_event_rule.ConfigRecorderStopped.name
+    target_id = "SendToLambda"
+    arn = aws_lambda_function.ComplianceRepair.arn
 }
