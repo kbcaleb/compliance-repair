@@ -16,7 +16,7 @@ This assumes you already have Macie setup as multi account.
     * CloudWatch events for
       * [iam:UpdateAccountPasswordPolicy](https://docs.aws.amazon.com/IAM/latest/APIReference/API_UpdateAccountPasswordPolicy.html)
       * [cloudtrail:StopLogging](https://docs.aws.amazon.com/awscloudtrail/latest/APIReference/API_StopLogging.html)
-      * [s3:DeleteBucketPublicAccessBlock](https://docs.amazonaws.cn/en_us/AmazonS3/latest/API/API_DeletePublicAccessBlock.html), [s3:PutBucketPublicAccessBlock](https://docs.amazonaws.cn/en_us/AmazonS3/latest/API/API_PutPublicAccessBlock.html), [s3:CreateBucket] (https://docs.amazonaws.cn/en_us/AmazonS3/latest/API/API_CreateBucket.html)
+      * [s3:DeleteBucketPublicAccessBlock](https://docs.amazonaws.cn/en_us/AmazonS3/latest/API/API_DeletePublicAccessBlock.html), [s3:PutBucketPublicAccessBlock](https://docs.amazonaws.cn/en_us/AmazonS3/latest/API/API_PutPublicAccessBlock.html), [s3:CreateBucket](https://docs.amazonaws.cn/en_us/AmazonS3/latest/API/API_CreateBucket.html)
       * [config:StopConfigurationRecorder](https://docs.aws.amazon.com/config/latest/APIReference/API_StopConfigurationRecorder.html)
 
 * Deploy the terraform spoke template into your spoke accounts.
@@ -26,7 +26,7 @@ This assumes you already have Macie setup as multi account.
     * CloudWatch events for
       * [iam:UpdateAccountPasswordPolicy](https://docs.aws.amazon.com/IAM/latest/APIReference/API_UpdateAccountPasswordPolicy.html)
       * [cloudtrail:StopLogging](https://docs.aws.amazon.com/awscloudtrail/latest/APIReference/API_StopLogging.html)
-      * [s3:DeleteBucketPublicAccessBlock](https://docs.amazonaws.cn/en_us/AmazonS3/latest/API/API_DeletePublicAccessBlock.html), [s3:PutBucketPublicAccessBlock](https://docs.amazonaws.cn/en_us/AmazonS3/latest/API/API_PutPublicAccessBlock.html), [s3:CreateBucket] (https://docs.amazonaws.cn/en_us/AmazonS3/latest/API/API_CreateBucket.html)
+      * [s3:DeleteBucketPublicAccessBlock](https://docs.amazonaws.cn/en_us/AmazonS3/latest/API/API_DeletePublicAccessBlock.html), [s3:PutBucketPublicAccessBlock](https://docs.amazonaws.cn/en_us/AmazonS3/latest/API/API_PutPublicAccessBlock.html), [s3:CreateBucket](https://docs.amazonaws.cn/en_us/AmazonS3/latest/API/API_CreateBucket.html)
       * [config:StopConfigurationRecorder](https://docs.aws.amazon.com/config/latest/APIReference/API_StopConfigurationRecorder.html)
 
 ## License
