@@ -1,5 +1,5 @@
 ## AWS Compliance Repair
-This demo PoC shows how to auto-remediate compliance issues at scale across accounts in your AWS account.
+This demo PoC shows how to auto-remediate compliance issues at scale across accounts in your AWS organization.
 
 ## Design
 ![Design](img/compliance-repair.png)

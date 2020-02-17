@@ -233,7 +233,7 @@ def lambda_handler(event, context):
         logger.info("Performing remote compliance repair on- %s ", account_id)
         cross_account_role_name = os.environ['CROSSROLE']
         cross_account_role = "arn:aws:iam::" + account_id + ":role/" + cross_account_role_name
-        logger.info("Using assumed role--%s for compliance repair" %cross_account_role)
+        logger.info("Using assumed role-- %s for compliance repair" %cross_account_role)
         sts_connection = boto3.client('sts')
         assume_acct = sts_connection.assume_role(
             RoleArn=cross_account_role,
