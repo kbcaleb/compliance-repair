@@ -5,7 +5,23 @@ This demo PoC shows how to auto-remediate compliance issues at scale across acco
 ![Design](img/compliance-repair.png)
 
 ## Prerequisites
-This assumes you already have Macie setup as multi account.
+This assumes you already have Macie with your spoke accounts.
+
+
+## Options
+[Account wide password policy](https://github.com/kbcaleb/compliance-repair/blob/master/main/lambda_function.py#L86-L98)
+Currently the default policy is
+```
+MinimumPasswordLength=14,
+RequireSymbols=True,
+RequireNumbers=True,
+RequireUppercaseCharacters=True,
+RequireLowercaseCharacters=True,
+AllowUsersToChangePassword=True,
+MaxPasswordAge=90,
+PasswordReusePrevention=24,
+HardExpiry=False
+```
 
 ## Deployment
 * Depoly the terraform main template into your central security account. This account should also be the same as your macie master account.
