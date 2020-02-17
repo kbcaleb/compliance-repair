@@ -20,13 +20,13 @@ This assumes you already have Macie setup with your [spoke accounts added](https
 
 ## Options
 ---
-* Terraform main variables.tf files
+* Terraform [main variables.tf](master/variables.tf) file
 ```
 aws_profile
 aws_region
 org_id
 ```
-* Terraform spoke variables.tf
+* Terraform [spoke variables.tf](spoke/variables.tf) file
 ```
 aws_profile
 aws_region
