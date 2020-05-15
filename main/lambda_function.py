@@ -51,7 +51,7 @@ def repair_password_policy(event, ACCESS_KEY, SECRET_KEY, SESSION_TOKEN):
         if 'RequireUppercaseCharacters' in response['PasswordPolicy']:
             requireuppercasecharacters = response['PasswordPolicy']['RequireUppercaseCharacters']
         else:
-            requireuppercasecharacters
+            requireuppercasecharacters = ''
             
         if 'RequireLowercaseCharacters' in response['PasswordPolicy']:
             requirelowercasecharacters = response['PasswordPolicy']['RequireLowercaseCharacters']
